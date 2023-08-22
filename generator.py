@@ -2,18 +2,16 @@
 import os
 import time
 import telebot
-from telebot import TeleBot, types
-
 import json
-from secrets import token_urlsafe
 
-# Library for generation testing users
+from telebot import TeleBot, types
 from faker import Faker
-faker = Faker('en_EN')
+from secrets import token_urlsafe
 
 # TODO: Paste Telegram token here
 token = 'YOUR_TOKEN'
-bot = telebot.TeleBot(token, parse_mode='html')
+bot = telebot.TeleBot(token, parse_mode = 'html')
+faker = Faker()
 
 # Main keyboard objects
 requests = ['Users', 'File', 'Credit card', 'Text']
@@ -54,11 +52,11 @@ def check_request(message):
 
 def users_handler(message):
     users = ['1️⃣', '2️⃣', '5️⃣', '🔟']
-    users_reply_markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
-    users_reply_markup.add(*users, row_width = 2)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
+    markup.add(*users, row_width = 2)
 
     bot.send_message(message.chat.id, f"Got it, let's generate test users. Choose how many users you want 👇")
-    reply_markup = users_reply_markup
+    reply_markup = markup
 
     payload_len = 0
     if message.text == '1️⃣':
@@ -70,8 +68,7 @@ def users_handler(message):
     elif message.text == "🔟":
         payload_len = 10
     else:
-        bot.send_message(message.chat.id, f"Sorry, I don't understand your query, try again.", reply_markup = users_reply_markup)
-        return
+        bot.send_message(message.chat.id, f"Sorry, I don't understand your query, try again.", reply_markup = markup)
     
     # Generate test data for the selected number of users using the simple_profile method
     total_payload = []
@@ -96,7 +93,7 @@ def users_handler(message):
     bot.send_message(message.chat.id, f"Data of {payload_len} test users:\n<code>"\
                      f"{payload_str}</code>")
     bot.send_message(message.chat.id, f"If you need more data, select again 👇",
-                     reply_markup = users_reply_markup)
+                     reply_markup = markup)
 
 def files_handler(message):
     formats = ['.jpg', '.png', '.svg', '.gif', '.ico', '.mp4', '.avi', '.webm', '.doc', '.docx', '.xls', '.xlsx', '.txt', '.pdf', '.css', '.html', '.js', '.json', '.zip', '.rar']
@@ -203,7 +200,34 @@ def files_handler(message):
             os.unlink(filename)
             bot.register_next_step_handler(reply, files_handler)
 
-# def card_handler(message):
+def card_handler(message):
+    cards = ['MasterCard', 'VISA', 'AmEx', 'Maestro', 'Discover', 'JCB']
+    markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
+    markup.add(*cards, row_width = 3)
+
+    bot.send_message(message.chat.id, f"Got it, let's generate the test bank card details. Select the payment system you need 👇")
+    reply_markup = markup
+
+    if message.text == 'VISA':
+        card_type = 'visa'
+    elif message.text == 'MasterСard':
+        card_type = 'mastercard'
+    elif message.text == 'Maestro':
+        card_type = 'maestro'
+    elif message.text == 'JCB':
+        card_type = 'jcb'
+    elif message.text == 'AmEx':
+        card_type = 'amex'
+    elif message.text == 'Discover':
+        card_type = 'discover'
+    else:
+        bot.send_message(message.chat.id, f"Sorry, I don't understand your query, try again.", reply_markup = markup)
+    
+    card_data = faker.credit_card_full(card_type)
+
+    bot.send_message(message.chat.id, f'Test bank card {card_type}:\n<code>{card_data}</code>')
+    bot.send_message(message.chat.id, f"If you need one more, select again 👇",
+                     reply_markup = markup)
 
 # def text_handler(message):
 
