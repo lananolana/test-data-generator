@@ -7,6 +7,7 @@ import json
 from telebot import TeleBot, types
 from faker import Faker
 from secrets import token_urlsafe
+from lorem_text import lorem
 
 # TODO: Paste Telegram token here
 token = 'YOUR_TOKEN'
@@ -54,12 +55,15 @@ def users_handler(message):
     users = ['1️⃣', '2️⃣', '5️⃣', '🔟']
     markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
     markup.add(*users, row_width = 2)
+    markup.add('Back to start')
 
     bot.send_message(message.chat.id, f"Got it, let's generate test users. Choose how many users you want 👇")
     reply_markup = markup
 
     payload_len = 0
-    if message.text == '1️⃣':
+    if (message.text == 'Back to start' or message.text == '/start'):
+        welcome(message)
+    elif message.text == '1️⃣':
         payload_len = 1
     elif message.text == "2️⃣":
         payload_len = 2
@@ -204,11 +208,14 @@ def card_handler(message):
     cards = ['MasterCard', 'VISA', 'AmEx', 'Maestro', 'Discover', 'JCB']
     markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
     markup.add(*cards, row_width = 3)
+    markup.add('Back to start')
 
     bot.send_message(message.chat.id, f"Got it, let's generate the test bank card details. Select the payment system you need 👇")
     reply_markup = markup
 
-    if message.text == 'VISA':
+    if (message.text == 'Back to start' or message.text == '/start'):
+        welcome(message)        
+    elif message.text == 'VISA':
         card_type = 'visa'
     elif message.text == 'MasterСard':
         card_type = 'mastercard'
@@ -229,7 +236,36 @@ def card_handler(message):
     bot.send_message(message.chat.id, f"If you need one more, select again 👇",
                      reply_markup = markup)
 
-# def text_handler(message):
+def text_handler(message):
+    bot.send_message(message.chat.id, f"Got it! I can generate text from 1 up to 4000 characters.\n\nPlease enter an integer without spaces or other characters 👇")
+    bot.register_next_step_handler(check_size)
+
+    def check_size(message):
+        if (message.text == 'Back to start' or message.text == '/start'):
+            welcome(message)
+
+        elif (isinstance(message.text, type(None)) or not message.text.isdigit()):
+            markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
+            markup.add('Back to start')
+
+            reply = bot.send_message(message.chat.id, f"Wrong number of characters. Please enter the correct one, I only accept positive integers from 1 to 4000, no spaces or other characters 🙂", reply_markup = markup)
+            bot.register_next_step_handler(check_size)
+
+        elif (message.text < 1 or message.text > 4000):
+            markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
+            markup.add('Back to start')
+
+            reply = bot.send_message(message.chat.id, f"The number of characters is beyond my capacity. Please enter the correct one, I only accept positive integers from 1 to 4000, no spaces or other characters 🙂", reply_markup = markup)
+            bot.register_next_step_handler(check_size)
+
+        else:
+            symbols = int(message.text)
+            reply = lorem.words(symbols)
+            bot.send_message(message.chat.id, f"This is your generated text with {symbols} characters.\n\n{reply}")
+            
+            markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
+            markup.add('Back to start')
+            bot.register_next_step_handler(check_size)
 
 # Main function, launching the polling bot
 def main():
