@@ -1,7 +1,6 @@
 # Set up libraries
 # pip install pyTelegramBotAPI
 # pip install Faker
-# pip install lorem-text
 
 import os
 import time
@@ -15,7 +14,7 @@ from faker import Faker
 from secrets import token_urlsafe
 
 # TODO: Paste Telegram token here
-token = 'TOKEN'
+token = '6478933033:AAGNf1Mg1xDWMkO2LZUDxjhAdX_E9v_8iP4'
 bot = TeleBot(token, parse_mode = 'html')
 faker = Faker()
 
@@ -68,6 +67,7 @@ def users_handler(message):
 def users_number(message: types.Message):
     payload_len = 0
     if (message.text == 'Back to start' or message.text == '/start'):
+        bot.register_next_step_handler(reply, welcome)
         welcome(message)
     elif message.text == '1️⃣':
         payload_len = 1
@@ -85,7 +85,7 @@ def users_number(message: types.Message):
     total_payload = []
     for _ in range(payload_len):
         user_info = faker.simple_profile()
-        user_info['phone'] = f'+XXX {faker.msisdn()[4:]}'
+        user_info['phone'] = f'{faker.msisdn()[4:]}'
 
         # Use the secrets library to generate a password
         user_info['password'] = token_urlsafe(10)
@@ -100,7 +100,7 @@ def users_number(message: types.Message):
         default = str)
 
     # Sending the result
-    bot.send_message(message.chat.id, f"Data of {payload_len} test users:\n<code>"\
+    bot.send_message(message.chat.id, f"Data of {payload_len} test users:\n\n<code>"\
                     f"{payload_str}</code>")
     reply = bot.send_message(message.chat.id, f"If you need more data, select again 👇")
     bot.register_next_step_handler(reply, users_number)
@@ -122,7 +122,7 @@ def check_format(message):
         files_markup.add("B", "KB", "MB", "Back to start")
             
         # Selecting the unit of measurement
-        reply = bot.send_message(message.chat.id, f"The selected extension is <b>{message.text}</b>\n\nNow choose a unit of measure.\n<u>A little size guide:</u>\n1 kilobyte = 1,024 bytes\n1 megabyte = 1,024 kilobytes = 1,048,576 bytes", reply_markup = files_markup)
+        reply = bot.send_message(message.chat.id, f"The selected extension is <b>{message.text}</b>\n\nNow choose a unit of measure.\n\n<b>A little size guide:</b>\n\n1 kilobyte = 1,024 bytes\n1 megabyte = 1,024 kilobytes = 1,048,576 bytes", reply_markup = files_markup)
         bot.register_next_step_handler(reply, check_unit, message)
         
     else:
@@ -145,7 +145,7 @@ def check_unit(message, format):
         files_markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
         files_markup.add('Back', 'Back to start')
 
-        reply = bot.send_message(message.chat.id, f"The selected extension is <b>{format.text}</b>\nUnit of measurement is <b>{message.text}</b>\n\nLast step left! Write the size of the file. I only accept integers, no spaces or other characters.\n⛔️ <u>Size limits:</u>\n<b>Minimum</b> — 1 byte\n<b>Maximum</b> — 45 MB (that's 46,080 KB or 47,185,920 bytes)", reply_markup = files_markup)
+        reply = bot.send_message(message.chat.id, f"The selected extension is <b>{format.text}</b>\nUnit of measurement is <b>{message.text}</b>\n\nLast step left! Write the size of the file. I only accept integers, no spaces or other characters.\n\n⛔️Size limits:\n\n<b>Minimum</b> — 1 byte\n<b>Maximum</b> — 45 MB (that's 46,080 KB or 47,185,920 bytes)", reply_markup = files_markup)
         bot.register_next_step_handler(reply, check_size, format, message)
         
     else:
@@ -180,7 +180,7 @@ def check_size(message, format, unit):
             
         # File size check
         if (size_bytes < 1 or size_bytes > 47185920):
-            reply = bot.send_message(message.chat.id, f"The file size is beyond my capacity.\n<u>⛔️ <u>Size limits:</u>\n<b>Minimum</b> — 1 byte\n<b>Maximum</b> — 45 MB (that's 46,080 KB or 47,185,920 bytes)\n\nPlease enter the appropriate size 🙂")
+            reply = bot.send_message(message.chat.id, f"The file size is beyond my capacity.\n\n⛔️ Size limits:\n\n<b>Minimum</b> — 1 byte\n<b>Maximum</b> — 45 MB (that's 46,080 KB or 47,185,920 bytes)\n\nPlease enter the appropriate size 🙂")
             bot.register_next_step_handler(reply, check_size, format, unit)
         else:
             timestamp = int(time.time())
@@ -196,19 +196,19 @@ def check_size(message, format, unit):
             if (unit.text == 'MB' or unit.text == 'KB'):
                 size_format = '{0:,}'.format(size).replace(',', ' ')
                 size_bytes_format = '{0:,}'.format(size_bytes).replace(',', ' ')
-                caption = f'Yay, your test file with the extension of <b>{format.text}</b> has been successfully generated!\n\nIts size is <b>{size_format} {unit.text}</b>\nIn bytes — <b>{size_bytes_format} B</b>'
+                caption = f'Yay, your test <b>{format.text}</b> file (<b>{size_format} {unit.text}</b> — {size_bytes_format} B) has been successfully generated!'
             else:
                 size_bytes_format = '{0:,}'.format(size_bytes).replace(',', ' ')
-                caption = f'Yay, your test file with the extension of <b>{format.text}</b> has been successfully generated!\n\nIts size is <b>{size_bytes_format} {unit.text}</b>'
+                caption = f'Yay, your test <b>{format.text}</b> file (<b>{size_bytes_format} {unit.text}</b>) has been successfully generated!'
                 
             f = open(filename,"rb")
             files_markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
-            files_markup.add('Generate one more')
+            files_markup.add('Back to start')
             reply = bot.send_document(message.chat.id, f, caption=caption, reply_markup = files_markup)
 
             f.close()
             os.unlink(filename)
-            bot.register_next_step_handler(reply, files_handler)
+            bot.register_next_step_handler(reply, welcome)
 
 def card_handler(message):
     card_markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
@@ -239,7 +239,7 @@ def payment_system(message: types.Message):
         
     card_data = faker.credit_card_full(card_type)
 
-    bot.send_message(message.chat.id, f'Test bank card {card_type}:\n<code>{card_data}</code>')
+    bot.send_message(message.chat.id, f'{message.text} card details:\n\n<code>{card_data}</code>')
     reply = bot.send_message(message.chat.id, f"If you need one more, select again 👇")
     bot.register_next_step_handler(reply, payment_system)
 
