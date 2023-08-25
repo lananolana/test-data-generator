@@ -80,9 +80,14 @@ def users_number(message: types.Message):
         payload_len = 5
     elif message.text == "🔟":
         payload_len = 10
+    elif (message.text.isdigit() and 0 < int(message.text) <= 15):
+        payload_len = int(message.text)
+    elif message.text.isdigit():
+        bot.send_message(message.chat.id, f"This is beyond my capacity. I can only generate 15 users at a time. Try again.")
+        bot.register_next_step_handler(message, users_number)
     else:
         bot.send_message(message.chat.id, f"Sorry, I don't understand your query, try again.")
-        bot.register_next_step_handler(reply, users_number)
+        bot.register_next_step_handler(message, users_number)
         
     # Generate test data for the selected number of users using the simple_profile method
     total_payload = []
