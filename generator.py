@@ -14,7 +14,7 @@ from faker import Faker
 from secrets import token_urlsafe
 
 # TODO: Paste Telegram token here
-token = '6478933033:AAGNf1Mg1xDWMkO2LZUDxjhAdX_E9v_8iP4'
+token = 'TOKEN'
 bot = TeleBot(token, parse_mode = 'html')
 faker = Faker()
 
