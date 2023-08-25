@@ -14,7 +14,7 @@ from faker import Faker
 from secrets import token_urlsafe
 
 # TODO: Paste Telegram token here
-token = '6478933033:AAGNf1Mg1xDWMkO2LZUDxjhAdX_E9v_8iP4'
+token = 'TOKEN'
 bot = TeleBot(token, parse_mode = 'html')
 faker = Faker()
 
@@ -44,7 +44,9 @@ def welcome(message):
     bot.register_next_step_handler(reply, check_request)
 
 def check_request(message):
-    if message.text == 'Users':
+    if message.text == '/start':
+        welcome(message)
+    elif message.text == 'Users':
         users_handler(message)
     elif message.text == 'File':
         files_handler(message)
@@ -101,10 +103,11 @@ def users_number(message: types.Message):
         default = str)
 
     # Sending the result
-    bot.send_message(message.chat.id, f"Data of {payload_len} test users:\n\n<code>"\
+    if payload_len != 0:
+      bot.send_message(message.chat.id, f"Data of {payload_len} test users:\n\n<code>"\
                     f"{payload_str}</code>")
-    reply = bot.send_message(message.chat.id, f"If you need more data, select again 👇")
-    bot.register_next_step_handler(reply, users_number)
+      reply = bot.send_message(message.chat.id, f"If you need more data, select again 👇")
+      bot.register_next_step_handler(reply, users_number)
 
 def files_handler(message):
     files_markup = types.ReplyKeyboardMarkup(resize_keyboard = True)
