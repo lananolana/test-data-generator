@@ -19,13 +19,13 @@ bot = TeleBot(token, parse_mode = 'html')
 faker = Faker()
 
 # Main keyboard objects
-requests = ['Users', 'File', 'Credit card', 'Text']
+requests = ['Users', 'File', 'Credit card', 'Text', '💬 Share feedback']
 users = ['1️⃣', '3️⃣', '5️⃣', '🔟']
 cards = ['MasterCard', 'VISA', 'AmEx', 'Maestro', 'Discover', 'JCB']
 formats = ['.jpg', '.png', '.svg', '.gif', '.ico', '.mp4', '.avi', '.webm', '.doc', '.docx', '.xls', '.xlsx', '.txt', '.pdf', '.css', '.html', '.js', '.json', '.zip', '.rar']
 
 # Custom command /start
-bot.set_my_commands([types.BotCommand('/start', 'Bot restart')])
+bot.set_my_commands([types.BotCommand('/start', 'Restart')])
 
 # Start command handler
 @bot.message_handler(commands = ['start'])
@@ -38,7 +38,7 @@ def welcome(message):
     markup.add(*requests, row_width = 2)
 
     # Sending reply for start command handler with keyboard object
-    reply = bot.send_message(message.chat.id, f"Hey, <b>{username}</b>! I'm a bot for generating test users, files, credit cards ans texts. Always ready to save your testing time.\n\nChoose exactly what you need to generate 👇", reply_markup = markup)
+    reply = bot.send_message(message.chat.id, f"Hey, <b>{username}</b>! I'm a bot for generating test users, files, credit cards and texts. Always ready to save your testing time.\n\nChoose exactly what you need to generate 👇", reply_markup = markup)
     
     # Register the transition to the next step
     bot.register_next_step_handler(reply, check_request)
@@ -52,6 +52,8 @@ def check_request(message):
         card_handler(message)
     elif message.text == 'Text':
         text_handler(message)
+    elif message.text == '💬 Share feedback':
+        feedback_handler(message)
     else:
         reply = bot.send_message(message.chat.id, f"Sorry, I don't understand your query, try again.")
         bot.register_next_step_handler(reply, check_request)
@@ -274,6 +276,15 @@ def text_generator(message: types.Message):
         bot.send_message(message.chat.id, f"If you need more data, enter an integer from 1 up to 4000 again 👇", reply_markup = text_markup)
 
         bot.register_next_step_handler(message, text_generator)
+
+def feedback_handler(message: types.Message):
+    feedback_button = types.InlineKeyboardMarkup()
+    coffee = types.InlineKeyboardButton(text = 'Buy creator a coffee ☕️', url = 'https://www.buymeacoffee.com/lananolana')
+    feedback_button.add(coffee)
+    
+    bot.send_message(message.chat.id, f"💡 Do you have any ideas on how to improve this simple bot for testing needs? Text to the creator @schoegar")
+    reply = bot.send_message(message.chat.id, f"To support the Test Data Generator project and say thank you, click the button below.", reply_markup = feedback_button)
+    bot.register_next_step_handler(reply, check_request)
 
 # Main function, launching the polling bot
 def main():
