@@ -69,7 +69,6 @@ def users_handler(message):
 def users_number(message: types.Message):
     payload_len = 0
     if (message.text == 'Back to start' or message.text == '/start'):
-        bot.register_next_step_handler(reply, welcome)
         welcome(message)
     elif message.text == '1️⃣':
         payload_len = 1
