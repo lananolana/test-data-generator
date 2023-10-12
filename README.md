@@ -9,7 +9,7 @@ Generate test data easily with Telegram bot: random users, credit cards, texts, 
 
 ## Features  🚀
 
-Test Data Generator is a Python-based project using pyTelegramBotAPI and Faker library. It provides a convenient way to generate data:
+Test Data Generator is a Python-based project using [pyTelegramBotAPI](https://github.com/eternnoir/pyTelegramBotAPI) and [Faker](https://github.com/joke2k/faker) package. It provides a convenient way to generate data:
 
 * **Users information.** Full name, mail, password, username, phone, birthdate, and address. Up to 15 users at a time in JSON format.
 * **Credit card details.** MasterCard, VISA, AmEx, Maestro, Discover, and JCB.
@@ -26,7 +26,7 @@ If you have any questions, suggestions, or feedback, feel free to [contact me on
 
 If you want to install the project yourself, here's what you need:
 
-1. Install libraries using pip (a Python package manager):
+1. Install packages using pip (a Python package manager):
 
     ```bash
     pip install pyTelegramBotAPI
