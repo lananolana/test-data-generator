@@ -1,0 +1,14 @@
+{
+    "hello_message": "I'm a bot for generating test users, files, credit cards and texts. Always ready to save your testing time.\n\nChoose exactly what you need to generate 👇",
+    "query_error": "Sorry, I don't understand your query, try again.",
+    
+    "users_generator": "Got it, let's generate test users. Choose how many users you want 👇",
+    "users_generator_error": "This is beyond my capacity. I can only generate 15 users at a time. Try again.",
+    "users_generator_again": "If you need more data, select again 👇",
+
+    "files_generator": "Got it. I can generate files of various extensions from 1 byte up to 45 megabytes. Choose the extension you need 👇",
+    "files_generator_tips": "Now choose a unit of measure.\n\n<b>A little size guide:</b>\n\n1 kilobyte = 1,024 bytes\n1 megabyte = 1,024 kilobytes = 1,048,576 bytes",
+    "files_generator_ext_error": "You may have chosen the wrong file extension, please choose one from the menu below 👇",
+    "files_generator_unit_error": "You may have selected the wrong unit of measurement, please choose one from the menu below 👇",
+    "files_generator_size_error": "Incorrect file size. Please enter the correct one, I only accept positive integers, no spaces or other characters 🙂"
+}
