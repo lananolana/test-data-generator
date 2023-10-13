@@ -1,11 +1,12 @@
 import json
-from config import faker, users
+from config import faker, users, bot
 from telebot import types
 from secrets import token_urlsafe
-from generator import welcome
+from generator import welcome, messages
 
 
-def users_handler(bot, message, messages):
+@bot.message_handler(commands=['users'])
+def users_handler(message):
     users_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     users_markup.add(*users, row_width=2)
     users_markup.add('Back to start')
@@ -16,7 +17,7 @@ def users_handler(bot, message, messages):
     bot.register_next_step_handler(reply, users_number)
 
 
-def users_number(bot, message, messages):
+def users_number(message):
     payload_len = 0
     if (message.text == 'Back to start' or message.text == '/start'):
         welcome(message)
