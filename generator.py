@@ -1,7 +1,3 @@
-# Set up libraries
-# pip install pyTelegramBotAPI
-# pip install Faker
-
 import os
 import time
 import json
@@ -68,7 +64,9 @@ def users_handler(message):
     users_markup.add(*users, row_width=2)
     users_markup.add('Back to start')
 
-    reply = bot.send_message(message.chat.id, messages["users_generator"], reply_markup=users_markup)
+    reply = bot.send_message(message.chat.id,
+                             messages["users_generator"],
+                             reply_markup=users_markup)
     bot.register_next_step_handler(reply, users_number)
 
 
@@ -93,7 +91,7 @@ def users_number(message: types.Message):
         bot.send_message(message.chat.id, messages["query_error"])
         bot.register_next_step_handler(message, users_number)
 
-    # Generate test data for the selected number of users using the simple_profile method
+    # Generate test data for the selected number of users
     total_payload = []
     for _ in range(payload_len):
         user_info = faker.simple_profile()
@@ -113,9 +111,10 @@ def users_number(message: types.Message):
 
     # Sending the result
     if payload_len != 0:
-        bot.send_message(message.chat.id, f"Data of {payload_len} test users:\n\n<code>"\
-                         f"{payload_str}</code>")
-        reply = bot.send_message(message.chat.id, messages["users_generator_again"])
+        bot.send_message(message.chat.id, f"Data of {payload_len} test users:"
+                         f"\n\n<code>{payload_str}</code>")
+        reply = bot.send_message(message.chat.id,
+                                 messages["generator_again"])
         bot.register_next_step_handler(reply, users_number)
 
 
@@ -124,7 +123,9 @@ def files_handler(message):
     files_markup.add(*formats, row_width=5)
     files_markup.add('Back to start')
 
-    reply = bot.send_message(message.chat.id, messages["files_generator"], reply_markup=files_markup)
+    reply = bot.send_message(message.chat.id,
+                             messages["files_generator"],
+                             reply_markup=files_markup)
     bot.register_next_step_handler(reply, check_format)
 
 
@@ -137,8 +138,11 @@ def check_format(message):
         files_markup.add("B", "KB", "MB", "Back to start")
 
         # Selecting the unit of measurement
-        reply = f"The selected extension is <b>{message.text}</b>\n\n" + messages["files_genetator_tips"]
-        bot.send_message(message.chat.id, reply, reply_markup=files_markup)
+        reply = bot.send_message(message.chat.id,
+                                 messages["files_ext"]
+                                 + f"<b>{message.text}</b>\n\n"
+                                 + messages["files_generator_unit"],
+                                 reply_markup=files_markup)
         bot.register_next_step_handler(reply, check_unit, message)
 
     else:
@@ -146,7 +150,9 @@ def check_format(message):
         files_markup.add(*formats, row_width=5)
         files_markup.add("Back to start")
 
-        reply = bot.send_message(message.chat.id, messages["files_generator_ext_error"], reply_markup=files_markup)
+        reply = bot.send_message(message.chat.id,
+                                 messages["files_generator_ext_error"],
+                                 reply_markup=files_markup)
         bot.register_next_step_handler(reply, check_format)
 
 
@@ -163,7 +169,11 @@ def check_unit(message, format):
         files_markup.add('Back', 'Back to start')
 
         reply = bot.send_message(message.chat.id,
-                                 f"The selected extension is <b>{format.text}</b>\nUnit of measurement is <b>{message.text}</b>\n\nLast step left! Write the size of the file. I only accept integers, no spaces or other characters.\n\n⛔️Size limits:\n\n<b>Minimum</b> — 1 byte\n<b>Maximum</b> — 45 MB (that's 46,080 KB or 47,185,920 bytes)",
+                                 messages["files_ext"]
+                                 + f"<b>{format.text}</b>"
+                                 + messages["files_unit"]
+                                 + f"<b>{message.text}</b>\n\n"
+                                 + messages["files_generator_size"],
                                  reply_markup=files_markup)
         bot.register_next_step_handler(reply, check_size, format, message)
 
@@ -171,7 +181,9 @@ def check_unit(message, format):
         files_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         files_markup.add('B', 'KB', 'MB', 'Back to start')
 
-        reply = bot.send_message(message.chat.id, messages["files_generator_unit_error"], reply_markup=files_markup)
+        reply = bot.send_message(message.chat.id,
+                                 messages["files_generator_unit_error"],
+                                 reply_markup=files_markup)
         bot.register_next_step_handler(reply, check_unit, format)
 
 
@@ -185,7 +197,9 @@ def check_size(message, format, unit):
         files_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         files_markup.add('Back', 'Back to start')
 
-        reply = bot.send_message(message.chat.id, messages["files_generator_size_error"], reply_markup=files_markup)
+        reply = bot.send_message(message.chat.id,
+                                 messages["files_generator_size_error"],
+                                 reply_markup=files_markup)
         bot.register_next_step_handler(reply, check_size, format, unit)
 
     else:
@@ -200,7 +214,8 @@ def check_size(message, format, unit):
 
         # File size check
         if (size_bytes < 1 or size_bytes > 47185920):
-            reply = bot.send_message(message.chat.id, "The file size is beyond my capacity.\n\n⛔️ Size limits:\n\n<b>Minimum</b> — 1 byte\n<b>Maximum</b> — 45 MB (that's 46,080 KB or 47,185,920 bytes)\n\nPlease enter the appropriate size 🙂")
+            reply = bot.send_message(message.chat.id,
+                                     messages["files_generator_big_file"])
             bot.register_next_step_handler(reply, check_size, format, unit)
         else:
             timestamp = int(time.time())
@@ -212,19 +227,27 @@ def check_size(message, format, unit):
             f.write(random_bytes)
             f.close()
 
-            # Smart output of the final message, depending on the selected units of measurement
+            # Smart output of the final message
             if (unit.text == 'MB' or unit.text == 'KB'):
                 size_format = '{0:,}'.format(size).replace(',', ' ')
-                size_bytes_format = '{0:,}'.format(size_bytes).replace(',', ' ')
-                caption = f'Yay, your test <b>{format.text}</b> file (<b>{size_format} {unit.text}</b> — {size_bytes_format} B) has been successfully generated!'
+                bytes_format = '{0:,}'.format(size_bytes).replace(',', ' ')
+
+                caption = f"Yay, your test <b>{format.text}</b> file"
+                f"(<b>{size_format} {unit.text}</b> — {bytes_format} B)"
+                "has been successfully generated!"
             else:
-                size_bytes_format = '{0:,}'.format(size_bytes).replace(',', ' ')
-                caption = f'Yay, your test <b>{format.text}</b> file (<b>{size_bytes_format} {unit.text}</b>) has been successfully generated!'
+                bytes_format = '{0:,}'.format(size_bytes).replace(',', ' ')
+
+                caption = f"Yay, your test <b>{format.text}</b> file"
+                f"(<b>{bytes_format} {unit.text}</b>)"
+                "has been successfully generated!"
 
             f = open(filename, "rb")
             files_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
             files_markup.add('Back to start')
-            reply = bot.send_document(message.chat.id, f, caption=caption, reply_markup=files_markup)
+            reply = bot.send_document(message.chat.id, f,
+                                      caption=caption,
+                                      reply_markup=files_markup)
 
             f.close()
             os.unlink(filename)
@@ -237,7 +260,7 @@ def card_handler(message):
     card_markup.add('Back to start')
 
     reply = bot.send_message(message.chat.id,
-                             "Got it, let's generate the test bank card details. Select the payment system you need 👇",
+                             messages["cards_generator"],
                              reply_markup=card_markup)
     bot.register_next_step_handler(reply, payment_system)
 
@@ -258,13 +281,15 @@ def payment_system(message: types.Message):
     elif message.text == 'Discover':
         card_type = 'discover'
     else:
-        bot.send_message(message.chat.id, messages["query_error"])
+        reply = bot.send_message(message.chat.id, messages["query_error"])
         bot.register_next_step_handler(reply, payment_system)
 
     card_data = faker.credit_card_full(card_type)
 
-    bot.send_message(message.chat.id, f'{message.text} card details:\n\n<code>{card_data}</code>')
-    reply = bot.send_message(message.chat.id, "If you need one more, select again 👇")
+    bot.send_message(message.chat.id,
+                     f"{message.text} card details:"
+                     f"\n\n<code>{card_data}</code>")
+    reply = bot.send_message(message.chat.id, messages["generator_again"])
     bot.register_next_step_handler(reply, payment_system)
 
 
@@ -272,7 +297,7 @@ def text_handler(message):
     text_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     text_markup.add('Back to start')
     reply = bot.send_message(message.chat.id,
-                             "Got it! I can generate text from 1 up to 4000 characters.\n\nPlease enter an integer without spaces or other characters 👇",
+                             messages["text_generator"],
                              reply_markup=text_markup)
 
     bot.register_next_step_handler(reply, text_generator)
@@ -287,35 +312,41 @@ def text_generator(message: types.Message):
 
     elif (isinstance(message.text, type(None)) or not message.text.isdigit()):
         bot.send_message(message.chat.id,
-                         "Wrong number of characters. Please enter the correct one, I only accept positive integers from 1 to 4000, no spaces or other characters 🙂",
+                         messages["text_generator_int_error"],
                          reply_markup=text_markup)
         bot.register_next_step_handler(message, text_generator)
 
     elif (int(message.text) < 1 or int(message.text) > 4000):
         bot.send_message(message.chat.id,
-                         "The number of characters is beyond my capacity. Please enter the correct one, I only accept positive integers from 1 to 4000, no spaces or other characters 🙂",
+                         messages["text_generator_size_error"],
                          reply_markup=text_markup)
         bot.register_next_step_handler(message, text_generator)
 
     else:
         symbols = int(message.text)
-        characters = string.ascii_letters + string.digits
-        final_reply = ''.join(random.choice(characters) for _ in range(symbols))
+        chars = string.ascii_letters + string.digits
+        final_reply = ''.join(random.choice(chars) for _ in range(symbols))
 
-        bot.send_message(message.chat.id, f"This is your generated text with {symbols} characters.\n\n<code>{final_reply}</code>")
-        bot.send_message(message.chat.id, "If you need more data, enter an integer from 1 up to 4000 again 👇", reply_markup=text_markup)
+        bot.send_message(message.chat.id,
+                         f"This is generated text with {symbols} characters."
+                         f"\n\n<code>{final_reply}</code>")
+        bot.send_message(message.chat.id,
+                         messages["text_generator_again"],
+                         reply_markup=text_markup)
 
         bot.register_next_step_handler(message, text_generator)
 
 
 def feedback_handler(message: types.Message):
     feedback_button = types.InlineKeyboardMarkup()
-    coffee = types.InlineKeyboardButton(text='Buy creator a coffee ☕️', url='https://www.buymeacoffee.com/lananolana')
+    url = 'https://www.buymeacoffee.com/lananolana'
+    coffee = types.InlineKeyboardButton(text='Buy creator a coffee ☕️',
+                                        url=url)
     feedback_button.add(coffee)
 
-    bot.send_message(message.chat.id, "💡 Do you have any ideas on how to improve this simple bot for testing needs? Text to the creator @schoegar")
+    bot.send_message(message.chat.id, messages["idea_message"])
     reply = bot.send_message(message.chat.id,
-                             "To support the Test Data Generator project and say thank you, click the button below.",
+                             messages["support_message"],
                              reply_markup=feedback_button)
     bot.register_next_step_handler(reply, check_request)
 
