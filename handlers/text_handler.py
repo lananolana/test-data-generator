@@ -1,6 +1,4 @@
-import random
-import string
-
+import json
 from config import bot
 from telebot import types
 from generator import welcome, messages
@@ -38,12 +36,15 @@ def text_generator(message: types.Message):
 
     else:
         symbols = int(message.text)
-        chars = string.ascii_letters + string.digits
-        final_reply = ''.join(random.choice(chars) for _ in range(symbols))
+
+        with open("lorem_ipsum.json", "r", encoding="utf-8") as file:
+            data = json.load(file)
+            reply = "".json(data[:symbols])
 
         bot.send_message(message.chat.id,
                          f"This is generated text with {symbols} characters."
-                         f"\n\n<code>{final_reply}</code>")
+                         f"\n\n<code>{reply}</code>")
+
         bot.send_message(message.chat.id,
                          messages["text_generator_again"],
                          reply_markup=text_markup)
