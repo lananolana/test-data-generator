@@ -3,6 +3,7 @@ from telebot import types
 from generator import messages, check_request
 
 
+@bot.message_handler(commands=['feedback'])
 def feedback_handler(message: types.Message):
     feedback_button = types.InlineKeyboardMarkup()
     url = 'https://www.buymeacoffee.com/lananolana'

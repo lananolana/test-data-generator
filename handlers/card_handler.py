@@ -16,23 +16,24 @@ def card_handler(message):
 
 
 def payment_system(message: types.Message):
-    if (message.text == 'Back to start' or message.text == '/start'):
-        welcome(message)
-    elif message.text == 'VISA':
-        card_type = 'visa'
-    elif message.text == 'MasterCard':
-        card_type = 'mastercard'
-    elif message.text == 'Maestro':
-        card_type = 'maestro'
-    elif message.text == 'JCB':
-        card_type = 'jcb'
-    elif message.text == 'AmEx':
-        card_type = 'amex'
-    elif message.text == 'Discover':
-        card_type = 'discover'
-    else:
-        reply = bot.send_message(message.chat.id, messages["query_error"])
-        bot.register_next_step_handler(reply, payment_system)
+    match message.text:
+        case 'Back to start' | '/start':
+            welcome(message)
+        case 'VISA':
+            card_type = 'visa'
+        case 'MasterCard':
+            card_type = 'mastercard'
+        case 'Maestro':
+            card_type = 'maestro'
+        case 'JCB':
+            card_type = 'jcb'
+        case 'AmEx':
+            card_type = 'amex'
+        case 'Discover':
+            card_type = 'discover'
+        case _:
+            reply = bot.send_message(message.chat.id, messages["query_error"])
+            bot.register_next_step_handler(reply, payment_system)
 
     card_data = faker.credit_card_full(card_type)
 
