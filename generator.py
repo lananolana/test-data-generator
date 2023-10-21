@@ -3,6 +3,7 @@ import json
 from handlers import (
     users_handler,
     card_handler,
+    iban_handler,
     file_handler,
     text_handler,
     feedback_handler
@@ -16,6 +17,7 @@ bot.set_my_commands([types.BotCommand(
     '/users',
     '/file',
     '/card',
+    '/iban',
     '/text',
     '/feedback'
 )])
@@ -50,21 +52,24 @@ def welcome(message):
 
 
 def check_request(message):
-    if message.text == '/start':
-        welcome(message)
-    elif message.text == ('Users' or '/users'):
-        users_handler.users_handler(message)
-    elif message.text == ('File' or '/file'):
-        file_handler.file_handler(message)
-    elif message.text == ('Credit card' or '/card'):
-        card_handler.card_handler(message)
-    elif message.text == ('Text' or '/text'):
-        text_handler(message)
-    elif message.text == ('💬 Share feedback' or 'feedback'):
-        feedback_handler.feedback_handler(message)
-    else:
-        reply = bot.send_message(message.chat.id, messages["query_error"])
-        bot.register_next_step_handler(reply, check_request)
+    match message.text:
+        case '/start':
+            welcome(message)
+        case 'Users' | '/users':
+            users_handler.users_handler(message)
+        case 'File' | '/file':
+            file_handler.file_handler(message)
+        case 'Credit card' | '/card':
+            card_handler.card_handler(message)
+        case 'IBAN' | '/iban':
+            iban_handler.iban_handler(message)
+        case 'Text' | '/text':
+            text_handler(message)
+        case '💬 Share feedback' | 'feedback':
+            feedback_handler.feedback_handler(message)
+        case _:
+            reply = bot.send_message(message.chat.id, messages["query_error"])
+            bot.register_next_step_handler(reply, check_request)
 
 
 # Main function, launching the polling bot
