@@ -20,7 +20,7 @@ Test Data Generator is a Python-based project using [pyTelegramBotAPI](https://g
 
 Contributions to this project are welcome! If you'd like to contribute, fork the repository, create a new branch, make your enhancements, and submit a pull request.
 
-If you have any questions, suggestions, or feedback, feel free to [contact me on Telegram](https://t.me/schoegar) or email: `schoegar@gmail.com`
+If you have any questions, suggestions, or feedback, feel free to [contact me on Telegram](https://t.me/schoegar) or email: `lanaalekseevaa@gmail.com`
 
 ## Installation
 
