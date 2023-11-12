@@ -1,5 +1,4 @@
 import json
-
 from handlers import (
     users_handler,
     card_handler,
@@ -8,7 +7,8 @@ from handlers import (
     text_handler,
     feedback_handler
 )
-from config import bot, messages, requests
+from data.keyboard_objects import requests
+from config import bot
 from telebot import types
 
 # Custom commands
@@ -24,7 +24,7 @@ bot.set_my_commands([types.BotCommand(
 
 
 def load_messages():
-    with open("messages.json", "r", encoding="utf-8") as file:
+    with open("data/messages.json", "r", encoding="utf-8") as file:
         messages = json.load(file)
     return messages
 
@@ -64,7 +64,7 @@ def check_request(message):
         case 'IBAN' | '/iban':
             iban_handler.iban_handler(message)
         case 'Text' | '/text':
-            text_handler(message)
+            text_handler.text_handler(message)
         case '💬 Share feedback' | 'feedback':
             feedback_handler.feedback_handler(message)
         case _:
