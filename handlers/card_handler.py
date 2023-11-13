@@ -1,6 +1,7 @@
-from config import faker, bot, cards
+from config import faker, bot
 from telebot import types
 from generator import welcome, messages
+from data.keyboard_objects import cards
 
 
 @bot.message_handler(commands=['card'])

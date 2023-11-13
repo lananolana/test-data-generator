@@ -1,5 +1,6 @@
 import json
-from config import faker, users, bot
+from config import faker, bot
+from data.keyboard_objects import users
 from telebot import types
 from secrets import token_urlsafe
 from generator import welcome, messages

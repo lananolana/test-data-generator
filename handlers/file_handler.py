@@ -1,9 +1,10 @@
 import os
 import time
 
-from config import bot, formats
+from config import bot
 from telebot import types
 from generator import welcome, messages
+from data.keyboard_objects import formats
 
 
 @bot.message_handler(commands=['file'])
