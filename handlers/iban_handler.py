@@ -1,4 +1,8 @@
-from config import faker, bot, iban_countries
+import random
+from schwifty import IBAN
+from config import faker, bot
+from data.keyboard_objects import iban_countries
+from data.iban_data import country_codes, bank_codes, acc_num_len
 from telebot import types
 from generator import welcome, messages
 
@@ -16,35 +20,41 @@ def iban_handler(message):
 
 
 def country_check(message: types.Message):
-    match message.text:
-        case 'Back to start' | '/start':
-            welcome(message)
-        case 'GB 🇬🇧':
-            country = 'gb'
-        # case 'BE 🇧🇪':
-        #     country = 'be'
-        # case 'GE 🇩🇪':
-        #     country = 'ge'
-        # case 'FR 🇫🇷':
-        #     country = 'fr'
-        # case 'NL 🇳🇱':
-        #     country = 'nl'
-        # case 'PT 🇵🇹':
-        #     country = 'pt'
-        case _:
-            reply = bot.send_message(message.chat.id, messages["query_error"])
-            bot.register_next_step_handler(reply, country_check)
-
-    bot.register_next_step_handler(reply, iban_generator, country)
+    country = country_codes.get(message.text)
+    if country == 'gb':
+        iban = faker.iban()
+        iban_sender(iban, message)
+    elif country:
+        iban_generator(message, country)
+    elif message.text in {'Back to start', '/start'}:
+        welcome(message)
+    else:
+        reply = bot.send_message(message.chat.id, messages["query_error"])
+        bot.register_next_step_handler(reply, country_check)
 
 
 def iban_generator(message, country):
-    match country:
-        case 'gb':
-            iban = faker.iban()
+    bank_code = random.choice(bank_codes[country])
+    bban = faker.bban()[-acc_num_len[country]:]
+    total = 0
 
+    for i in range(acc_num_len[country]):
+        digit = int(bban[i])
+        if i % 2 == 1:
+            digit *= 2
+        total += digit
+
+    bban_check_digit = total % 11
+    account_number = bban + str(bban_check_digit)
+
+    iban = IBAN.generate(country.upper(), bank_code, account_number)
+    iban_sender(iban, message)
+
+
+def iban_sender(iban, message):
     bot.send_message(message.chat.id,
                      f"{message.text} IBAN:"
                      f"\n\n<code>{iban}</code>")
+
     reply = bot.send_message(message.chat.id, messages["generator_again"])
     bot.register_next_step_handler(reply, country_check)
