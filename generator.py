@@ -8,19 +8,12 @@ from handlers import (
     feedback_handler
 )
 from data.keyboard_objects import requests
-from config import bot
+from config import bot, commands
 from telebot import types
 
 # Custom commands
-bot.set_my_commands([types.BotCommand(
-    '/start',
-    '/users',
-    '/file',
-    '/card',
-    '/iban',
-    '/text',
-    '/feedback'
-)])
+bot.set_my_commands([types.BotCommand(command[0], command[1])
+                     for command in commands])
 
 
 def load_messages():
@@ -65,7 +58,7 @@ def check_request(message):
             iban_handler.iban_handler(message)
         case 'Text' | '/text':
             text_handler.text_handler(message)
-        case '💬 Share feedback' | 'feedback':
+        case '💬 Share feedback' | '/feedback':
             feedback_handler.feedback_handler(message)
         case _:
             reply = bot.send_message(message.chat.id, messages["query_error"])
