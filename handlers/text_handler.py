@@ -37,9 +37,10 @@ def text_generator(message: types.Message):
     else:
         symbols = int(message.text)
 
-        with open("lorem_ipsum.json", "r", encoding="utf-8") as file:
-            data = json.load(file)
-            reply = "".json(data[:symbols])
+        with open("/data/lorem_ipsum.json", "r", encoding="utf-8") as file:
+            json_data = json.load(file)
+            data = json_data["lorem_ipsum"]
+            reply = data[:symbols]
 
         bot.send_message(message.chat.id,
                          f"This is generated text with {symbols} characters."
