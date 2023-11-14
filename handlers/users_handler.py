@@ -1,6 +1,6 @@
 import json
 from config import faker, bot
-from data.keyboard_objects import users
+from data.keyboard_objects import users, payload_lens
 from telebot import types
 from secrets import token_urlsafe
 from generator import welcome, messages
@@ -19,26 +19,23 @@ def users_handler(message):
 
 
 def users_number(message):
-    payload_len = 0
-    if (message.text == 'Back to start' or message.text == '/start'):
-        welcome(message)
-    elif message.text == '1️⃣':
-        payload_len = 1
-    elif message.text == "3️⃣":
-        payload_len = 3
-    elif message.text == "5️⃣":
-        payload_len = 5
-    elif message.text == "🔟":
-        payload_len = 10
+    payload_len = payload_lens.get(message.text)
+    if payload_len:
+        users_generator(payload_len, message)
     elif (message.text.isdigit() and 0 < int(message.text) <= 15):
         payload_len = int(message.text)
+        users_generator(payload_len, message)
     elif message.text.isdigit():
         bot.send_message(message.chat.id, messages["users_generator_error"])
         bot.register_next_step_handler(message, users_number)
+    elif message.text in {'Back to start', '/start'}:
+        welcome(message)
     else:
-        bot.send_message(message.chat.id, messages["query_error"])
-        bot.register_next_step_handler(message, users_number)
+        reply = bot.send_message(message.chat.id, messages["query_error"])
+        bot.register_next_step_handler(reply, users_number)
 
+
+def users_generator(payload_len, message):
     # Generate test data for the selected number of users
     total_payload = []
     for _ in range(payload_len):
@@ -57,10 +54,11 @@ def users_number(message):
         ensure_ascii=False,
         default=str)
 
-    # Sending the result
-    if payload_len != 0:
-        bot.send_message(message.chat.id, f"Data of {payload_len} test users:"
-                         f"\n\n<code>{payload_str}</code>")
-        reply = bot.send_message(message.chat.id,
-                                 messages["generator_again"])
-        bot.register_next_step_handler(reply, users_number)
+    users_sender(payload_len, payload_str, message)
+
+
+def users_sender(payload_len, payload_str, message):
+    bot.send_message(message.chat.id, f"Data of {payload_len} test users:"
+                     f"\n\n<code>{payload_str}</code>")
+    reply = bot.send_message(message.chat.id, messages["generator_again"])
+    bot.register_next_step_handler(reply, users_number)

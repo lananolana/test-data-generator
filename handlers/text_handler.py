@@ -40,14 +40,18 @@ def text_generator(message: types.Message):
         with open("/data/lorem_ipsum.json", "r", encoding="utf-8") as file:
             json_data = json.load(file)
             data = json_data["lorem_ipsum"]
-            reply = data[:symbols]
+            text = data[:symbols]
 
-        bot.send_message(message.chat.id,
-                         f"This is generated text with {symbols} characters."
-                         f"\n\n<code>{reply}</code>")
+        text_sender(symbols, text, message)
 
-        bot.send_message(message.chat.id,
-                         messages["text_generator_again"],
-                         reply_markup=text_markup)
 
-        bot.register_next_step_handler(message, text_generator)
+def text_sender(symbols, text, message):
+    text_markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    text_markup.add('Back to start')
+
+    bot.send_message(message.chat.id,
+                     f"This is generated text with {symbols} characters."
+                     f"\n\n<code>{text}</code>")
+    bot.send_message(message.chat.id, messages["text_generator_again"],
+                     reply_markup=text_markup)
+    bot.register_next_step_handler(message, text_generator)
