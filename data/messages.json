@@ -4,6 +4,7 @@
     "generator_again": "If you need more data, select again 👇",
     
     "users_generator": "Got it, let's generate test users. Choose how many users you want 👇",
+    "users_generated": "test users:\n\n",
     "users_generator_error": "This is beyond my capacity. I can only generate 15 users at a time. Try again.",
 
     "files_generator": "Got it. I can generate files of various extensions from 1 byte up to 45 megabytes. Choose the extension you need 👇",
@@ -23,6 +24,7 @@
     "iban_generator": "Got it, let's generate a test IBAN. Select the country you need 👇",
 
     "text_generator": "Got it! I can generate text from 1 up to 4000 characters.\n\nPlease enter an integer without spaces or other characters 👇",
+    "text_generated": "This is generated text. Chars: ",
     "text_generator_int_error": "Wrong number of characters. Please enter the correct one, I only accept positive integers from 1 to 4000, no spaces or other characters 🙂",
     "text_generator_size_error": "The number of characters is beyond my capacity. Please enter the correct one, I only accept positive integers from 1 to 4000, no spaces or other characters 🙂",
     "text_generator_again": "If you need more data, enter an integer from 1 up to 4000 again 👇",
