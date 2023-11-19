@@ -1,9 +1,9 @@
 [
-    { "command": "/start", "description": "Start command", "icon": "start_icon.png" },
-    { "command": "/users", "description": "Generate user data", "icon": "users_icon.png" },
-    { "command": "/file", "description": "Generate files", "icon": "file_icon.png" },
-    { "command": "/card", "description": "Generate bank cards", "icon": "card_icon.png" },
-    { "command": "/iban", "description": "Generate IBANs", "icon": "iban_icon.png" },
-    { "command": "/text", "description": "Generate text", "icon": "text_icon.png" },
-    { "command": "/feedback", "description": "Leave feedback", "icon": "feedback_icon.png" }
+    { "command": "/start", "description": "Start command" },
+    { "command": "/users", "description": "Generate user data" },
+    { "command": "/file", "description": "Generate files" },
+    { "command": "/card", "description": "Generate bank cards" },
+    { "command": "/iban", "description": "Generate IBANs" },
+    { "command": "/text", "description": "Generate text" },
+    { "command": "/feedback", "description": "Leave feedback" }
 ]
