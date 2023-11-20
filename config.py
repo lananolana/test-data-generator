@@ -12,14 +12,6 @@ from faker import Faker
 token = 'TOKEN'
 faker = Faker()
 bot = TeleBot(token, parse_mode='html')
-requests = [
-    'Users',
-    'File',
-    'Credit card',
-    'IBAN',
-    'Text',
-    '💬 Share feedback'
-]
 
 
 class users_objects:
