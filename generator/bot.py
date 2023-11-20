@@ -1,28 +1,16 @@
 import json
-from telebot import types
-from config import bot, requests
-from utils.common_handlers import handlers
+from config import bot
+from telebot.types import BotCommand
+from data.commands import COMMANDS
+from utils.bot_handler import BotHandler
 from utils.constants import common
-from .handlers import (
-    users_handler,
-    card_handler,
-    iban_handler,
-    file_handler,
-    text_handler,
-    feedback_handler
-)
 
 
 class Generator:
     def __init__(self):
         self.command_handlers = {
-            '/start': self.welcome,
-            '/users': users_handler.users_handler,
-            '/file': file_handler.file_handler,
-            '/card': card_handler.card_handler,
-            '/iban': iban_handler.iban_handler,
-            '/text': text_handler.text_handler,
-            '/feedback': feedback_handler.feedback_handler,
+            command.command: BotHandler.get_handler(command.handler)
+            for command in COMMANDS
         }
         self.load_messages()
 
@@ -31,9 +19,8 @@ class Generator:
             commands_data = json.load(file)
 
         self.bot_commands = [
-            types.BotCommand(command["command"],
-                             command["description"],
-                             command.get("icon", None))
+            BotCommand(command["command"],
+                       command["description"])
             for command in commands_data
             ]
 
@@ -43,21 +30,11 @@ class Generator:
 
     @bot.message_handler(commands=['start'])
     def welcome(self, message):
-        self.send_welcome_message(message)
-
-    def send_welcome_message(self, message):
-        username = message.from_user.first_name
-        markup = handlers.markup_setup(requests, 2)
-
-        reply = {username} + common.HELLO_MESSAGE
-        handlers.send_message(message, reply, markup, self.check_request)
-
-    @bot.message_handler(func=lambda message: True)
-    def check_request(self, message):
-        command = message.text.lower()
-        handler = self.command_handlers.get(
-            command, handlers.error(
-                message, common.QUERY_ERROR, self.markup, self.check_request
+        command = message.text
+        if command in self.command_handlers:
+            BotHandler.send_welcome_message(message)
+            self.command_handlers[command](message)
+        else:
+            BotHandler.error(
+                message, common.QUERY_ERROR, next_handler=self.welcome
             )
-        )
-        handler(message)
