@@ -1,8 +1,8 @@
 from telebot import types
 from config import bot
-from utils.common_handlers import handlers
+from utils.bot_handler import BotHandler
 from utils.constants import common
-from bot import check_request
+from .welcome import welcome
 
 
 @bot.message_handler(commands=['feedback'])
@@ -14,7 +14,7 @@ def feedback_handler(message: types.Message):
     feedback_button = types.InlineKeyboardMarkup()
     feedback_button.add(coffee)
 
-    handlers.send_message(message, common.IDEA_MESSAGE)
-    handlers.send_message(
-        message, common.SUPPORT_MESSAGE, feedback_button, check_request
+    BotHandler.send_message(message, common.IDEA_MESSAGE)
+    BotHandler.send_message(
+        message, common.SUPPORT_MESSAGE, feedback_button, welcome(message)
     )
