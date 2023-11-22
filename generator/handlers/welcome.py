@@ -8,13 +8,13 @@ from data.commands import COMMANDS
 def welcome(message):
     command = message.text
     command_handlers = {
-            command.command: BotHandler.get_handler(command.handler)
-            for command in COMMANDS
-        }
-    
+        cmd.command: cmd.handler for cmd in COMMANDS
+    }
+
     if command in command_handlers:
+        handler_function = BotHandler.get_handler(command_handlers[command])
         BotHandler.send_welcome_message(message)
-        command_handlers[command](message)
+        handler_function(message)
     else:
         BotHandler.error(
             message, common.QUERY_ERROR, next_handler=welcome
