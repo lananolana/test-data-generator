@@ -1,11 +1,12 @@
+import importlib
 from telebot import types
-from config import faker, bot, acc_num_len
-from generator.bot import Generator
+from config import faker, bot, iban_objects
+from data.commands import COMMANDS
+from utils.constants import common
 
-generator = Generator()
 
+class BotHandler:
 
-class handlers:
     @staticmethod
     def markup_setup(options, row_width):
         return types.ReplyKeyboardMarkup(
@@ -17,9 +18,8 @@ class handlers:
         message, *args, markup=None,
         next_handler=None, trans_data=None
     ):
-        formatted_text = ''.join([generator.messages[arg] for arg in args])
         reply = bot.send_message(
-            message.chat.id, formatted_text,
+            message.chat.id, *args,
             reply_markup=markup, parse_mode='HTML')
         if next_handler:
             bot.register_next_step_handler(reply, next_handler, trans_data)
@@ -31,8 +31,8 @@ class handlers:
         )
 
     @staticmethod
-    def error(message, error, markup, next_handler, trans_data=None):
-        handlers.send_message(
+    def error(message, error, markup=None, next_handler=None, trans_data=None):
+        BotHandler.send_message(
             message, error, markup, next_handler, trans_data)
 
     @staticmethod
@@ -56,18 +56,29 @@ class handlers:
         message, back_handler, error, markup,
         next_handler, trans_data=None
     ):
-        if handlers.is_back(message.text):
+        if BotHandler.is_back(message.text):
             back_handler()
-        elif handlers.is_back_to_start(message.text):
-            handlers.welcome(message)
+        elif BotHandler.is_back_to_start(message.text):
+            BotHandler.send_welcome_message(message)
         else:
-            handlers.error(
+            BotHandler.error(
                 message, error, markup,
                 next_handler, trans_data)
 
     @staticmethod
-    def welcome(message):
-        generator.welcome(message)
+    def send_welcome_message(message):
+        username = message.from_user.first_name
+        requests = [command.button for command in COMMANDS]
+        markup = BotHandler.markup_setup(requests, 2)
+        reply = {username} + common.HELLO_MESSAGE
+        BotHandler.send_message(message, reply, markup=markup)
+
+    @staticmethod
+    def get_handler(handler_name):
+        handler_module = importlib.import_module(
+            f'generator.handlers.{handler_name}'
+        )
+        return getattr(handler_module, handler_name)
 
     @staticmethod
     def convert_to_bytes(unit, size):
@@ -76,10 +87,10 @@ class handlers:
 
     @staticmethod
     def generate_account_number(country):
-        bban = faker.bban()[-acc_num_len[country]:]
+        bban = faker.bban()[-iban_objects.acc_num_len[country]:]
         total = 0
 
-        for i in range(acc_num_len[country]):
+        for i in range(iban_objects.acc_num_len[country]):
             digit = int(bban[i])
             if i % 2 == 1:
                 digit *= 2
