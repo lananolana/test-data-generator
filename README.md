@@ -5,7 +5,8 @@ Generate test data easily with Telegram bot: random users, credit cards, texts, 
 [![Telegram Bot](https://img.shields.io/badge/telegram_bot-090909?style=for-the-badge&logo=telegram)](https://t.me/testdatagenerator_bot)
 [![Python](https://img.shields.io/badge/python-090909?style=for-the-badge&logo=python&logoColor=3776AB)](https://www.python.org/downloads/)
 
-> Take a look at this bot before hosting it yourself, and let's improve it together: [Test Data Generator](https://t.me/testdatagenerator_bot) 👈
+
+[//]: # "Take a look at this bot before hosting it yourself, and let's improve it together: [Test Data Generator](https://t.me/testdatagenerator_bot) 👈"
 
 ## Features  🚀
 
